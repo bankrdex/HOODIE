@@ -1,0 +1,18 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjEwNzk5MjIsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHg3NWNhQTExM0Y1NzJhNDA3RWRiOGE0OUZjZTFjZjk0MTBFZjE4ODFjIn0",
+    "payload": "eyJkb21haW4iOiJob29kaWUtYmV0YS52ZXJjZWwuYXBwIn0",
+    "signature": "k/I/ivsY+bW3Agqp24hPBPAch8VKyRbhKl7cjHgmA9Yeo/0bp/nYkNkcttm3ej+IVOaCz/nVktCPsH8dNGIQORw="
+  },
+  "frame": {
+    "version": "1",
+    "name": "HOOD",
+    "iconUrl": "https://hoodie-beta.vercel.app/icon.png",
+    "homeUrl": "https://hoodie-beta.vercel.app",
+    "imageUrl": "https://hoodie-beta.vercel.app/og.png",
+    "buttonTitle": "Shop HOOD",
+    "splashImageUrl": "https://hoodie-beta.vercel.app/splash.png",
+    "splashBackgroundColor": "#0a0a0a",
+    "webhookUrl": "https://hoodie-beta.vercel.app/api/webhook"
+  }
+}
