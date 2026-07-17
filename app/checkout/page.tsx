@@ -101,8 +101,8 @@ export default function CheckoutPage() {
   if (coupon) {
     switch (coupon.discount_type) {
       case 'free_hoodie':
-        finalTotal = shippingFee
         couponDiscount = subtotal
+        finalTotal = shippingFee
         break
       case 'percentage':
         couponDiscount = subtotal * (discountValue / 100)
@@ -708,12 +708,10 @@ export default function CheckoutPage() {
                     <span className="text-lime-400">Coupon ({coupon.code})</span>
                     <span className="text-lime-400">-${couponDiscount.toFixed(2)} USDC</span>
                   </div>
-                  {coupon.shipping_fee > 0 && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-zinc-500">Shipping</span>
-                      <span>${Number(coupon.shipping_fee).toFixed(2)} USDC</span>
-                    </div>
-                  )}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-zinc-500">Shipping</span>
+                    <span>${Number(shippingFee).toFixed(2)} USDC</span>
+                  </div>
                 </>
               )}
               <div className="border-t border-zinc-800 pt-2 flex justify-between font-black text-lg">

@@ -29,8 +29,8 @@ export default function CartDrawer() {
   if (coupon) {
     switch (coupon.discount_type) {
       case 'free_hoodie':
-        finalTotal = shippingFee
         couponDiscount = subtotal
+        finalTotal = shippingFee
         break
       case 'percentage':
         couponDiscount = subtotal * (discountValue / 100)
@@ -147,12 +147,10 @@ export default function CartDrawer() {
                     <span className="text-lime-400">Coupon ({coupon.code})</span>
                     <span className="text-lime-400">-${couponDiscount.toFixed(2)} USDC</span>
                   </div>
-                  {shippingFee > 0 && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-zinc-500">Shipping</span>
-                      <span>${shippingFee.toFixed(2)} USDC</span>
-                    </div>
-                  )}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-zinc-500">Shipping</span>
+                    <span>${shippingFee.toFixed(2)} USDC</span>
+                  </div>
                 </>
               )}
               <div className="flex justify-between font-black">
