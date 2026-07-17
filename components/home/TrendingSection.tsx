@@ -2,23 +2,27 @@ import ProductCard from "@/components/product/ProductCard";
 
 const products = [
   {
+    id: "classic-black",
     name: "Classic Black",
-    price: "$45",
+    price: 45,
     image: "/hoodies/black-front.png",
   },
   {
+    id: "classic-white",
     name: "Classic White",
-    price: "$45",
+    price: 45,
     image: "/hoodies/white-front.png",
   },
   {
+    id: "creator-edition",
     name: "Creator Edition",
-    price: "$49",
+    price: 49,
     image: "/hoodies/creator.png",
   },
   {
+    id: "street-edition",
     name: "Street Edition",
-    price: "$49",
+    price: 49,
     image: "/hoodies/street.png",
   },
 ];
@@ -39,10 +43,10 @@ export default function TrendingSection() {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {products.map((product) => (
           <ProductCard
-            key={product.name}
+            key={product.id}
+            id={product.id}
             name={product.name}
             price={product.price}
-            image={product.image}
           />
         ))}
       </div>

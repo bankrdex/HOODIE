@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, Variants } from 'framer-motion'
 import Navbar from '@/components/layout/Navbar'
 import {
   Palette,
@@ -63,16 +63,23 @@ const FEATURES = [
   },
 ]
 
-const container = {
+const container: Variants = {
   hidden: {},
   show: {
     transition: { staggerChildren: 0.08 },
   },
 }
 
-const item = {
+const item: Variants = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] } },
+  show: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      duration: 0.45, 
+      ease: [0.25, 0.1, 0.25, 1] as const 
+    } 
+  },
 }
 
 export default function DesignerPage() {

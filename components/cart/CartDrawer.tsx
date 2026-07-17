@@ -98,7 +98,7 @@ export default function CartDrawer() {
                         </button>
                       </div>
                       <span className="text-sm font-bold">
-                        ${(item.product.base_price * item.quantity).toFixed(2)} USDC
+                        ${((item.product.base_price + item.variant.price_modifier) * item.quantity).toFixed(2)} USDC
                       </span>
                     </div>
                   </div>
