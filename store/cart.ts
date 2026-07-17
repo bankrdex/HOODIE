@@ -41,7 +41,9 @@ export interface OrderCustomization {
 
 export interface AppliedCoupon {
   code: string
-  discount: number
+  discount_type: 'fixed' | 'percentage' | 'free_hoodie'
+  discount_value: number
+  shipping_fee: number
   label: string
 }
 

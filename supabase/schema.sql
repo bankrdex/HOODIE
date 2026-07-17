@@ -41,7 +41,9 @@ create table public.product_variants (
 create table public.coupons (
   id uuid primary key default gen_random_uuid(),
   code text unique not null,
-  discount_amount numeric(10,2) not null,
+  discount_type text default 'fixed' check (discount_type in ('fixed', 'percentage', 'free_hoodie')),
+  discount_value numeric(10,2) default 0,
+  shipping_fee numeric(10,2) default 0,
   max_uses integer default 100,
   times_used integer default 0,
   is_active boolean default true,

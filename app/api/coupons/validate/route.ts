@@ -48,10 +48,21 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  let label = ''
+  if (coupon.discount_type === 'free_hoodie') {
+    label = 'FREE HOODIE (Pay only shipping)'
+  } else if (coupon.discount_type === 'percentage') {
+    label = `${coupon.discount_value}% off your order`
+  } else {
+    label = `$${coupon.discount_value} off your order`
+  }
+
   return NextResponse.json({
     valid: true,
-    discount: coupon.discount_amount,
-    label: `$${coupon.discount_amount} off one hoodie`,
     coupon_id: coupon.id,
+    discount_type: coupon.discount_type,
+    discount_value: coupon.discount_value,
+    shipping_fee: coupon.shipping_fee,
+    label,
   })
 }

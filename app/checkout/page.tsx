@@ -91,14 +91,38 @@ export default function CheckoutPage() {
   })
 
   // Totals
-  const subtotal = total()
-  const itemPrices = items.map(
-    (i) => (i.product.base_price + i.variant.price_modifier) * i.quantity
-  )
-  const couponDiscount = coupon
-    ? Math.min(coupon.discount, Math.min(...itemPrices))
-    : 0
-  const finalTotal = Math.max(0, subtotal - couponDiscount)
+  const subtotal = Number(total() || 0)
+  const discountValue = Number(coupon?.discount_value || 0)
+  const shippingFee = Number(coupon?.shipping_fee || 0)
+
+  let finalTotal = 0
+  let couponDiscount = 0
+
+  if (coupon) {
+    switch (coupon.discount_type) {
+      case 'free_hoodie':
+        finalTotal = shippingFee
+        couponDiscount = subtotal
+        break
+      case 'percentage':
+        couponDiscount = subtotal * (discountValue / 100)
+        finalTotal = Math.max(0, subtotal - couponDiscount + shippingFee)
+        break
+      case 'fixed':
+        couponDiscount = Math.min(subtotal, discountValue)
+        finalTotal = Math.max(0, subtotal - couponDiscount + shippingFee)
+        break
+      default:
+        finalTotal = subtotal + shippingFee
+    }
+  } else {
+    finalTotal = subtotal
+  }
+
+  // Final validation to prevent NaN
+  if (isNaN(finalTotal) || !isFinite(finalTotal)) {
+    finalTotal = 0
+  }
 
   // Coupon
   async function applyCode() {
@@ -118,7 +142,9 @@ export default function CheckoutPage() {
     }
     setCoupon({
       code: couponInput.trim().toUpperCase(),
-      discount: data.discount,
+      discount_type: data.discount_type,
+      discount_value: data.discount_value,
+      shipping_fee: data.shipping_fee,
       label: data.label,
     })
     setCouponId(data.coupon_id)
@@ -384,7 +410,7 @@ export default function CheckoutPage() {
                       {item.variant.color} · {item.variant.size} · Qty {item.quantity}
                     </p>
                     <p className="mt-1 text-sm font-black text-lime-400">
-                      ${(item.product.base_price * item.quantity).toFixed(2)} USDC
+                      ${((item.product.base_price + item.variant.price_modifier) * item.quantity).toFixed(2)} USDC
                     </p>
                   </div>
                 </div>
@@ -632,7 +658,7 @@ export default function CheckoutPage() {
                     <div className="h-6 w-6 rounded-full border border-zinc-700 flex-shrink-0" style={{ backgroundColor: item.variant.color_hex }} />
                     <span className="text-sm">{item.variant.color} / {item.variant.size} × {item.quantity}</span>
                   </div>
-                  <span className="text-sm font-bold">${(item.product.base_price * item.quantity).toFixed(2)}</span>
+                  <span className="text-sm font-bold">${((item.product.base_price + item.variant.price_modifier) * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
@@ -676,11 +702,19 @@ export default function CheckoutPage() {
                 <span className="text-zinc-500">Subtotal</span>
                 <span>${subtotal.toFixed(2)} USDC</span>
               </div>
-              {couponDiscount > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-lime-400">{coupon?.code}</span>
-                  <span className="text-lime-400">-${couponDiscount.toFixed(2)} USDC</span>
-                </div>
+              {coupon && (
+                <>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-lime-400">Coupon ({coupon.code})</span>
+                    <span className="text-lime-400">-${couponDiscount.toFixed(2)} USDC</span>
+                  </div>
+                  {coupon.shipping_fee > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-zinc-500">Shipping</span>
+                      <span>${Number(coupon.shipping_fee).toFixed(2)} USDC</span>
+                    </div>
+                  )}
+                </>
               )}
               <div className="border-t border-zinc-800 pt-2 flex justify-between font-black text-lg">
                 <span>Total</span>

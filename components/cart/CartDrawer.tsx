@@ -19,8 +19,37 @@ export default function CartDrawer() {
   const total = useCartStore((s) => s.total)
   const coupon = useCartStore((s) => s.coupon)
 
-  const couponDiscount = coupon ? Math.min(coupon.discount, Math.min(...items.map((i) => i.product.base_price * i.quantity))) : 0
-  const finalTotal = Math.max(0, total() - couponDiscount)
+  const subtotal = Number(total() || 0)
+  const discountValue = Number(coupon?.discount_value || 0)
+  const shippingFee = Number(coupon?.shipping_fee || 0)
+
+  let finalTotal = 0
+  let couponDiscount = 0
+
+  if (coupon) {
+    switch (coupon.discount_type) {
+      case 'free_hoodie':
+        finalTotal = shippingFee
+        couponDiscount = subtotal
+        break
+      case 'percentage':
+        couponDiscount = subtotal * (discountValue / 100)
+        finalTotal = Math.max(0, subtotal - couponDiscount + shippingFee)
+        break
+      case 'fixed':
+        couponDiscount = Math.min(subtotal, discountValue)
+        finalTotal = Math.max(0, subtotal - couponDiscount + shippingFee)
+        break
+      default:
+        finalTotal = subtotal + shippingFee
+    }
+  } else {
+    finalTotal = subtotal
+  }
+
+  if (isNaN(finalTotal) || !isFinite(finalTotal)) {
+    finalTotal = 0
+  }
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && closeCart()}>
@@ -110,13 +139,21 @@ export default function CartDrawer() {
             <div className="border-t border-zinc-800 px-5 py-4 space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-zinc-500">Subtotal</span>
-                <span>${total().toFixed(2)} USDC</span>
+                <span>${subtotal.toFixed(2)} USDC</span>
               </div>
-              {couponDiscount > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-lime-400">Coupon</span>
-                  <span className="text-lime-400">-${couponDiscount.toFixed(2)} USDC</span>
-                </div>
+              {coupon && (
+                <>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-lime-400">Coupon ({coupon.code})</span>
+                    <span className="text-lime-400">-${couponDiscount.toFixed(2)} USDC</span>
+                  </div>
+                  {shippingFee > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-zinc-500">Shipping</span>
+                      <span>${shippingFee.toFixed(2)} USDC</span>
+                    </div>
+                  )}
+                </>
               )}
               <div className="flex justify-between font-black">
                 <span>Total</span>
