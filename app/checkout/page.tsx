@@ -581,11 +581,11 @@ export default function CheckoutPage() {
               {([
                 { key: 'name', label: 'Full Name', placeholder: 'Your name', type: 'text' },
                 { key: 'email', label: 'Email', placeholder: 'you@example.com', type: 'email' },
-                { key: 'phone', label: 'Phone', placeholder: '+234 800 000 0000', type: 'tel' },
-                { key: 'address', label: 'Address', placeholder: '123 Street, Apt 4B', type: 'text' },
-                { key: 'city', label: 'City', placeholder: 'Lagos', type: 'text' },
-                { key: 'state', label: 'State / Province', placeholder: 'Lagos State', type: 'text' },
-                { key: 'country', label: 'Country', placeholder: 'Nigeria', type: 'text' },
+                { key: 'phone', label: 'Phone', placeholder: '+1 555 000 0000', type: 'tel' },
+                { key: 'address', label: 'Address', placeholder: '123 Fashion Ave, Suite 100', type: 'text' },
+                { key: 'city', label: 'City', placeholder: 'New York', type: 'text' },
+                { key: 'state', label: 'State / Province', placeholder: 'NY', type: 'text' },
+                { key: 'country', label: 'Country', placeholder: 'United States', type: 'text' },
               ] as { key: keyof ShippingForm; label: string; placeholder: string; type: string }[]).map(({ key, label, placeholder, type }) => (
                 <div key={key}>
                   <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-zinc-600">
