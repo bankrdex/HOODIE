@@ -43,7 +43,7 @@ export default function ProductPage({
   const placementStyle = PLACEMENT_COLORS[product.printPlacement]
 
   function handleAddToCart() {
-    if (!selectedSize || !selectedColor) return
+    if (!product || !selectedSize || !selectedColor) return
     const variant: ProductVariant = {
       id: `${product.id}-${selectedColor.id}-${selectedSize}`,
       size: selectedSize,
