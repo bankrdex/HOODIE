@@ -1,43 +1,53 @@
-// 10 coupon codes — $20 off ONE hoodie per order
-// Single-use enforcement requires Supabase (Phase 3)
-// V1: validates code is real, applies discount client-side
-
-export const VALID_COUPONS: Record<string, { discount: number; label: string }> = {
-  'ZABAL-HOOD01': { discount: 20, label: '$20 off one hoodie' },
-  'ZABAL-HOOD02': { discount: 20, label: '$20 off one hoodie' },
-  'ZABAL-HOOD03': { discount: 20, label: '$20 off one hoodie' },
-  'ZABAL-HOOD04': { discount: 20, label: '$20 off one hoodie' },
-  'ZABAL-HOOD05': { discount: 20, label: '$20 off one hoodie' },
-  'ZABAL-HOOD06': { discount: 20, label: '$20 off one hoodie' },
-  'ZABAL-HOOD07': { discount: 20, label: '$20 off one hoodie' },
-  'ZABAL-HOOD08': { discount: 20, label: '$20 off one hoodie' },
-  'ZABAL-HOOD09': { discount: 20, label: '$20 off one hoodie' },
-  'ZABAL-HOOD10': { discount: 20, label: '$20 off one hoodie' },
-}
+// Client-side coupon types only
+// All validation happens server-side via /api/coupons/validate
+// Never import VALID_COUPONS on the client — codes live in Supabase only
 
 export interface CouponResult {
   valid: boolean
   discount: number
+  shipping_fee: number
+  discount_type: 'fixed' | 'percentage' | 'free_hoodie'
+  campaign: string
   label: string
+  coupon_id?: string
   error?: string
 }
 
-export function validateCoupon(code: string): CouponResult {
-  const normalized = code.trim().toUpperCase()
-  const coupon = VALID_COUPONS[normalized]
-  if (!coupon) {
-    return { valid: false, discount: 0, label: '', error: 'Invalid coupon code.' }
-  }
-  return { valid: true, discount: coupon.discount, label: coupon.label }
+export interface AppliedCoupon {
+  code: string
+  coupon_id: string
+  discount_type: 'fixed' | 'percentage' | 'free_hoodie'
+  discount_value: number
+  shipping_fee: number
+  campaign: string
+  label: string
 }
 
-// Coupon applies $20 off only one hoodie — not the full cart
-// Returns the actual discount amount (capped at cheapest item price)
-export function computeCouponDiscount(
-  itemPrices: number[],
-  couponDiscount: number
-): number {
-  if (!couponDiscount || itemPrices.length === 0) return 0
-  const cheapest = Math.min(...itemPrices)
-  return Math.min(couponDiscount, cheapest)
+// Compute final total with coupon applied
+// free_hoodie: pay shipping only ($9.99)
+// fixed: subtract fixed amount from subtotal
+// percentage: subtract percentage from subtotal
+export function computeFinalTotal(
+  subtotal: number,
+  coupon: AppliedCoupon | null
+): { discount: number; shipping: number; total: number } {
+  const shipping = coupon?.discount_type === 'free_hoodie'
+    ? coupon.shipping_fee
+    : 0
+
+  if (!coupon) {
+    return { discount: 0, shipping: 0, total: subtotal }
+  }
+
+  let discount = 0
+  if (coupon.discount_type === 'free_hoodie') {
+    discount = subtotal // full hoodie price off
+  } else if (coupon.discount_type === 'fixed') {
+    discount = Math.min(coupon.discount_value, subtotal)
+  } else if (coupon.discount_type === 'percentage') {
+    discount = (subtotal * coupon.discount_value) / 100
+  }
+
+  const total = Math.max(0, subtotal - discount) + shipping
+  return { discount, shipping, total }
 }

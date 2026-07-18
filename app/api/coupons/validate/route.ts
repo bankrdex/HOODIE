@@ -12,7 +12,6 @@ export async function POST(req: NextRequest) {
   const supabase = createServerClient()
   const normalized = code.trim().toUpperCase()
 
-  // 1. Check coupon exists and is active
   const { data: coupon, error } = await supabase
     .from('coupons')
     .select('*')
@@ -24,17 +23,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ valid: false, error: 'Invalid coupon code.' })
   }
 
-  // 2. Check not expired
   if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
     return NextResponse.json({ valid: false, error: 'This coupon has expired.' })
   }
 
-  // 3. Check usage limit
   if (coupon.times_used >= coupon.max_uses) {
-    return NextResponse.json({ valid: false, error: 'This coupon has already been used.' })
+    return NextResponse.json({ valid: false, error: 'This coupon has already been redeemed.' })
   }
 
-  // 4. Check if this wallet already used it
   if (wallet_address) {
     const { data: existing } = await supabase
       .from('coupon_uses')
@@ -48,21 +44,15 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  let label = ''
-  if (coupon.discount_type === 'free_hoodie') {
-    label = 'FREE HOODIE (Pay only shipping)'
-  } else if (coupon.discount_type === 'percentage') {
-    label = `${coupon.discount_value}% off your order`
-  } else {
-    label = `$${coupon.discount_value} off your order`
-  }
-
   return NextResponse.json({
     valid: true,
     coupon_id: coupon.id,
     discount_type: coupon.discount_type,
     discount_value: coupon.discount_value,
     shipping_fee: coupon.shipping_fee,
-    label,
+    campaign: coupon.campaign,
+    label: coupon.discount_type === 'free_hoodie'
+      ? `Free hoodie — pay $${coupon.shipping_fee} shipping only`
+      : `$${coupon.discount_value} off`,
   })
 }
